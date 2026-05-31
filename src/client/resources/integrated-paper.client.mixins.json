@@ -2,7 +2,7 @@
   "required": true,
   "package": "io.github.archiso86.paper.client.mixin",
   "compatibilityLevel": "JAVA_25",
-  "client": ["MinecraftMixin", "WorldOpenFlowsMixin"],
+  "client": ["DisconnectedScreenMixin", "MinecraftMixin", "WorldOpenFlowsMixin"],
   "injectors": {
     "defaultRequire": 1
   },

@@ -10,7 +10,7 @@ No configuration necessary, just start playing Paper!
 |  | Location relative to client root |
 | :---: | :---: |
 | **Server Root** | server/ |
-| **Server Jar** | server.jar |
+| **Server Jar** | server.jar *(Must be 26.1 or higher!)* |
 | **World** | <unchanged> |
 | **Java** | <unchanged> |
 
