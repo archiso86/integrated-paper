@@ -11,6 +11,14 @@ repositories {
 		name = "Modrinth"
 		url = uri("https://api.modrinth.com/maven")
 	}
+	maven {
+		name = "Terraformers"
+		url = uri("https://maven.terraformersmc.com/releases/")
+	}
+	maven {
+		name = "Xander Maven"
+		url = uri("https://maven.isxander.dev/releases")
+	}
 }
 
 loom {
@@ -23,6 +31,11 @@ loom {
 	}
 }
 
+val modMenuApiStub = sourceSets.create("modMenuApiStub") {
+	java.srcDir("src/modMenuApiStub/java")
+	compileClasspath += loom.namedMinecraftJars
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
@@ -32,6 +45,10 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 
+	compileOnly("dev.isxander:yet-another-config-lib:${providers.gradleProperty("yacl_version").get()}")
+	add("clientCompileOnly", modMenuApiStub.output)
+
+	runtimeOnly("dev.isxander:yet-another-config-lib:${providers.gradleProperty("yacl_version").get()}")
 	runtimeOnly("maven.modrinth:viafabricplus:4.5.4")
 }
 

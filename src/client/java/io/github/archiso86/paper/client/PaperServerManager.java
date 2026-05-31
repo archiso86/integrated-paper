@@ -12,7 +12,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -210,7 +209,7 @@ public final class PaperServerManager {
         Files.createDirectories(serverDirectory);
         Files.createDirectories(serverDirectory.resolve("plugins"));
 
-        int nextPort = findOpenPort();
+        int nextPort = IntegratedPaperConfig.get().serverPort;
         writeEula(serverDirectory);
         Path universePath = worldPath.getParent();
         Path worldNamePath = worldPath.getFileName();
@@ -562,13 +561,6 @@ public final class PaperServerManager {
             value >>>= 7;
         }
         output.writeByte(value);
-    }
-
-    private static int findOpenPort() throws IOException {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            socket.setReuseAddress(false);
-            return socket.getLocalPort();
-        }
     }
 
     private static Path javaBinary() {

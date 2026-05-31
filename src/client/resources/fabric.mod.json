@@ -9,7 +9,8 @@
   "icon": "assets/integrated-paper/icon.png",
   "environment": "client",
   "entrypoints": {
-    "client": ["io.github.archiso86.paper.client.IntegratedPaperClient"]
+    "client": ["io.github.archiso86.paper.client.IntegratedPaperClient"],
+    "modmenu": ["io.github.archiso86.paper.client.IntegratedPaperModMenu"]
   },
   "mixins": [
     {
@@ -21,6 +22,10 @@
     "fabricloader": ">=0.19.2",
     "minecraft": "~26.1.2",
     "java": ">=25",
-    "fabric-api": "*"
+    "fabric-api": "*",
+    "yet_another_config_lib_v3": ">=3.9.3+26.1-fabric"
+  },
+  "suggests": {
+    "modmenu": "*"
   }
 }
