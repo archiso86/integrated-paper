@@ -48,11 +48,11 @@ public class MinecraftMixin {
 
 	@Inject(method = "destroy", at = @At("HEAD"))
 	private void integratedpaper$stopPaperOnDestroy(CallbackInfo callbackInfo) {
-		PaperServerManager.stopCurrentServer();
+		PaperServerManager.stopCurrentServerForExit();
 	}
 
 	@Inject(method = "stop", at = @At("HEAD"))
 	private void integratedpaper$stopPaperOnStop(CallbackInfo callbackInfo) {
-		PaperServerManager.stopCurrentServer();
+		PaperServerManager.stopCurrentServerForExit();
 	}
 }

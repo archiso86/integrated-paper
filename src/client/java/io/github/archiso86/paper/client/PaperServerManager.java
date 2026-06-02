@@ -51,6 +51,7 @@ public final class PaperServerManager {
     private static int port;
     private static String levelId;
     private static boolean onlineMode;
+    private static boolean gameClosing;
 
     private PaperServerManager() {}
 
@@ -97,6 +98,10 @@ public final class PaperServerManager {
         stopProcess(claimCurrentServer());
     }
 
+    public static void stopCurrentServerForExit() {
+        stopProcess(claimCurrentServerForExit());
+    }
+
     public static void stopCurrentServerAsync(
         Minecraft minecraft,
         Screen nextScreen
@@ -122,6 +127,20 @@ public final class PaperServerManager {
     private static Process claimCurrentServer() {
         Process current;
         synchronized (LOCK) {
+            current = process;
+            process = null;
+            levelId = null;
+            port = 0;
+            onlineMode = false;
+        }
+
+        return current;
+    }
+
+    private static Process claimCurrentServerForExit() {
+        Process current;
+        synchronized (LOCK) {
+            gameClosing = true;
             current = process;
             process = null;
             levelId = null;
@@ -179,10 +198,23 @@ public final class PaperServerManager {
             access.safeClose();
             int nextPort = ensureRunning(worldPath, nextLevelId, user);
             waitForStatusResponse(nextPort);
+            if (isGameClosing()) {
+                stopCurrentServerForExit();
+                return;
+            }
             minecraft.execute(() -> connect(minecraft, nextPort));
         } catch (Exception exception) {
             stopCurrentServer();
+            if (isGameClosing()) {
+                return;
+            }
             minecraft.execute(() -> showError(minecraft, exception));
+        }
+    }
+
+    private static boolean isGameClosing() {
+        synchronized (LOCK) {
+            return gameClosing;
         }
     }
 
@@ -193,6 +225,9 @@ public final class PaperServerManager {
     ) throws IOException {
         boolean nextOnlineMode = isLoggedIn(user);
         synchronized (LOCK) {
+            if (gameClosing) {
+                throw new IOException("Minecraft is closing");
+            }
             if (
                 process != null &&
                 process.isAlive() &&
@@ -241,11 +276,19 @@ public final class PaperServerManager {
         builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 
         Process nextProcess = builder.start();
+        boolean stopStartedProcess;
         synchronized (LOCK) {
-            process = nextProcess;
-            port = nextPort;
-            levelId = nextLevelId;
-            onlineMode = nextOnlineMode;
+            stopStartedProcess = gameClosing;
+            if (!stopStartedProcess) {
+                process = nextProcess;
+                port = nextPort;
+                levelId = nextLevelId;
+                onlineMode = nextOnlineMode;
+            }
+        }
+        if (stopStartedProcess) {
+            stopProcess(nextProcess);
+            throw new IOException("Minecraft is closing");
         }
         return nextPort;
     }
@@ -439,6 +482,9 @@ public final class PaperServerManager {
         while (System.nanoTime() < deadline) {
             Process current;
             synchronized (LOCK) {
+                if (gameClosing) {
+                    throw new IOException("Minecraft is closing");
+                }
                 current = process;
             }
             if (current == null || !current.isAlive()) {
