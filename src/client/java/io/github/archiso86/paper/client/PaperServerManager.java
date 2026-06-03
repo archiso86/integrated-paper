@@ -411,7 +411,6 @@ public final class PaperServerManager {
         return (
             accessToken != null &&
             !accessToken.isBlank() &&
-            user.getXuid().isPresent() &&
             !offlinePlayerId(user.getName()).equals(user.getProfileId())
         );
     }
